@@ -13,7 +13,7 @@ var bzOptions = {
   autoRefresh: false,
   domElement: "#bzkanban",
   backlogDefaultStatus: "CONFIRMED",
-  requiresResolution: { RESOLVED: true }
+  requiresResolution: { "RESOLVED": true }
 };
 
 // "Private" global variables. Do not touch.
@@ -41,7 +41,11 @@ var bzAuthObject;
 function initBzkanban(options) {
   bzOptions = Object.assign(bzOptions, options); // Merge custom options into defaults.
   loadParams();
-  async.parallel([initNav, initBoard], function (err, results) {
+  async.parallel([
+        initNav, 
+        initBoard
+  ],
+  function(err, results) {
     console.log("bzkanban initialized!");
   });
 }
@@ -97,12 +101,14 @@ function initNav(callback) {
 
   nav.appendChild(createActions());
 
-  async.parallel([loadName, loadProductsList, loadMilestonesList], function (
-    err,
-    results
-  ) {
-    console.log("Nav initialized!");
-    callback();
+  async.parallel([
+    loadName,
+    loadProductsList,
+    loadMilestonesList
+  ],
+  function(err, results) {
+      console.log("Nav initialized!");
+      callback();
   });
 }
 
@@ -120,7 +126,7 @@ function initBoard(callbackInitBoard) {
       loadSeverities,
       loadDefaultPrioritySeverityFields
     ],
-    function (err, results) {
+    function(err, results) {
       console.log("Board initialized!");
       callbackInitBoard();
       fetchAllUserBugs("assigned_to");
@@ -344,10 +350,17 @@ function showLoginModal() {
   var passwordLabel = document.createElement("label");
   passwordLabel.innerText = "Password";
 
+<<<<<<< HEAD
   var password = document.createElement("input");
   password.id = "textPassword";
   password.type = "password";
   password.required = true;
+=======
+function loginModalVisible() {
+    return document.querySelector(bzOptions.domElement).querySelector("#loginModal") != null;
+}
+
+>>>>>>> Fix for #80 multiple login popups
 
   // When the user presses enter, in the Login password form
   password.addEventListener("keyup", function (event) {
@@ -440,8 +453,7 @@ function loadBugs(callback) {
   bzBoardLoadTime = new Date().toISOString();
 
   bzRestGetBugsUrl = "/rest.cgi/bug?product=" + bzProduct;
-  bzRestGetBugsUrl +=
-    "&include_fields=summary,status,resolution,id,severity,priority,assigned_to,last_updated,deadline";
+  bzRestGetBugsUrl += "&include_fields=summary,status,resolution,id,severity,priority,assigned_to,last_updated,deadline";
   bzRestGetBugsUrl += "&order=" + bzOptions.order;
   bzRestGetBugsUrl += "&target_milestone=" + bzProductMilestone;
   bzRestGetBugsUrl += "&component=" + bzComponent;
@@ -542,7 +554,7 @@ function loadAssigneesList() {
   // HACK add phony user so that we can show all users
   bzAssignees.set("", { real_name: "ALL", email: "" });
 
-  var sorted = Array.from(bzAssignees.values()).sort(function (a, b) {
+  var sorted = Array.from(bzAssignees.values()).sort(function(a, b) {
     return a.real_name.localeCompare(b.real_name);
   });
 
@@ -590,13 +602,13 @@ function loadColumnsAndCards(callback) {
 }
 
 function loadColumns(callback) {
-  httpGet("/rest.cgi/field/bug/status/values", function (response) {
+   httpGet("/rest.cgi/field/bug/status/values", function(response) {
     // Always add a backlog as first column
     var backlog = addBoardColumn("BACKLOG");
     hideBacklog();
 
     var statuses = response.values;
-    statuses.forEach(function (status) {
+    statuses.forEach(function(status) {
       addBoardColumn(status);
     });
 
@@ -1099,6 +1111,7 @@ function httpRequest(method, url, dataObj, successCallback, errorCallback) {
         return successCallback(obj);
       }
 
+<<<<<<< HEAD
       if (obj.error !== null) {
         hideSpinner();
         switch (obj.code) {
@@ -1106,6 +1119,31 @@ function httpRequest(method, url, dataObj, successCallback, errorCallback) {
             // auth token has expired
             signOut();
             break;
+=======
+            if (obj.error !== null) {
+                hideSpinner();
+                console.error(obj.message);
+
+                switch (obj.code) {
+                    case "32000":
+                        // auth token has expired
+                        signOut();
+                        break;
+                    case "410":
+                        // "You must log in before using this part of Bugzilla."
+                        if(!loginModalVisible()) {
+                            showLoginModal();
+                        }
+                        break;
+                }
+
+                if (errorCallback !== undefined) {
+                    errorCallback(obj);
+                } else {
+                    //alert(obj.message);
+                }
+            }
+>>>>>>> Fix for #80 multiple login popups
         }
 
         console.error(obj.message);
@@ -1273,7 +1311,8 @@ function scheduleCheckForUpdates() {
   }, 600000);
 }
 
-function dragCardStart(ev) {}
+function dragCardStart(ev) {
+}
 
 function dragCardOver(ev) {
   ev.preventDefault();
@@ -1281,6 +1320,7 @@ function dragCardOver(ev) {
 
 function dragCardEnter(ev) {
   ev.preventDefault();
+
   if (ev.target.classList.contains("board-column")) {
     ev.currentTarget.classList.add("drag-card");
   }
@@ -1296,7 +1336,7 @@ function dragCard(ev) {
   // Disable pointer-events for all other cards so that we
   // can reliably detect when a card enters and leaves a column.
   var cards = document.querySelectorAll(".card");
-  cards.forEach(function (card) {
+  cards.forEach(function(card) {
     if (card.dataset.bugId != ev.currentTarget.dataset.bugId) {
       card.style.pointerEvents = "none";
     }
@@ -1310,15 +1350,13 @@ function dragCard(ev) {
     priority: card.dataset.bugPriority,
     severity: card.dataset.bugSeverity
   };
-
-  console.log("data", bugData);
   ev.dataTransfer.setData("text", JSON.stringify(bugData));
 }
 
 function dragCardEnd(ev) {
   // Re-enable pointer events for all cards.
   var cards = document.querySelectorAll(".card");
-  cards.forEach(function (card) {
+  cards.forEach(function(card) {
     card.style.pointerEvents = "auto";
   });
 }
