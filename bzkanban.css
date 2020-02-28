@@ -8,6 +8,11 @@ body {
     margin: 0;
     height: 100%;
 }
+
+#UNCONFIRMED, #VERIFIED {
+	display: none;
+}
+
 #bzkanban {
     display: flex;
     height: 100%;
