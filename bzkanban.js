@@ -350,17 +350,10 @@ function showLoginModal() {
   var passwordLabel = document.createElement("label");
   passwordLabel.innerText = "Password";
 
-<<<<<<< HEAD
   var password = document.createElement("input");
   password.id = "textPassword";
   password.type = "password";
   password.required = true;
-=======
-function loginModalVisible() {
-    return document.querySelector(bzOptions.domElement).querySelector("#loginModal") != null;
-}
-
->>>>>>> Fix for #80 multiple login popups
 
   // When the user presses enter, in the Login password form
   password.addEventListener("keyup", function (event) {
@@ -388,6 +381,10 @@ function loginModalVisible() {
   footer.appendChild(submit);
 
   document.querySelector(bzOptions.domElement).appendChild(loginModal);
+}
+
+function loginModalVisible() {
+    return document.querySelector(bzOptions.domElement).querySelector("#loginModal") != null;
 }
 
 function loadBoard(callbackLoadBoard, state) {
@@ -1095,13 +1092,14 @@ function httpGet(url, successCallback, errorCallback) {
 }
 
 function httpRequest(method, url, dataObj, successCallback, errorCallback) {
+
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function () {
     if (xhr.readyState == XMLHttpRequest.DONE) {
       var response = xhr.responseText;
       if (response === "") {
         var msg =
-          "No response from " + bzOptions.siteUrl + " for request " + url;
+          "No response from " + bzOptions.siteUrl + url;
         console.warn(msg);
         return;
       }
@@ -1111,49 +1109,27 @@ function httpRequest(method, url, dataObj, successCallback, errorCallback) {
         return successCallback(obj);
       }
 
-<<<<<<< HEAD
       if (obj.error !== null) {
         hideSpinner();
+	console.error(obj.message);
+
         switch (obj.code) {
           case "32000":
             // auth token has expired
             signOut();
             break;
-=======
-            if (obj.error !== null) {
-                hideSpinner();
-                console.error(obj.message);
-
-                switch (obj.code) {
-                    case "32000":
-                        // auth token has expired
-                        signOut();
-                        break;
-                    case "410":
-                        // "You must log in before using this part of Bugzilla."
-                        if(!loginModalVisible()) {
-                            showLoginModal();
-                        }
-                        break;
-                }
-
-                if (errorCallback !== undefined) {
-                    errorCallback(obj);
-                } else {
-                    //alert(obj.message);
-                }
+	  case "410":
+	    // "You must log in before using this part of Bugzilla."
+            if(!loginModalVisible()) {
+              showLoginModal();
             }
->>>>>>> Fix for #80 multiple login popups
+            break;
         }
-
-        console.error(obj.message);
-        console.log(obj);
-        console.log("error callback", errorCallback);
-
+        
         if (errorCallback !== undefined) {
           errorCallback(obj);
         } else {
-          alert(obj.message);
+          //alert(obj.message);
         }
       }
     }
