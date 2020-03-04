@@ -284,6 +284,7 @@ function createActions() {
 
     var login = document.createElement("button");
     login.id = "btnSignIn";
+    login.className = "btnStyle";
     login.innerText = "Login";
     login.addEventListener("click", function() {
         showLoginModal();
