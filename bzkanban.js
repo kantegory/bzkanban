@@ -128,6 +128,7 @@ function initBoard(callbackInitBoard) {
     function(err, results) {
         console.log("Board initialized!");
         callbackInitBoard();
+        initAllBugs();
     });
 }
 
@@ -566,8 +567,6 @@ function loadName(callback) {
         return callback();
     }
     console.log('this is bzAuthObject', bzAuthObject)
-
-    initAllBugs();
 
     httpGet("/rest.cgi/user/" + bzAuthObject.userID, function(response) {
         bzUserFullName = response.users[0].real_name;
@@ -1749,24 +1748,40 @@ document.addEventListener("keyup", function(e) {
 
 async function initAllBugs() {
 
-    let uname = bzOptions.siteUrl + '/rest/user/' + bzAuthObject.userID + '?include_fields=name';
+    let uname = bzOptions.siteUrl + '/rest/user/' + bzAuthObject.userID + '?token=' + bzAuthObject.userToken + '&include_fields=name';
+    let response = await fetch(uname);
+    let name = await response.json();
+    name = name.users[0].name;
 
+    let allBugsUrl = bzOptions.siteUrl + '/rest/bug?token=' + bzAuthObject.userToken +  '&assigned_to=' + name;
+    let allBugsResponse = await fetch(allBugsUrl);
+    let allBugs = await allBugsResponse.json();
 
-
-    // url = bzOptions.siteUrl + '/bugs&token=' + bzAuthObject.userToken;
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', uname, false);
-
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.setRequestHeader('Content-type', 'application/json');
-    
-    xhr.send();
-
-    let response = await xhr.responseText;
-
-    console.log(response);
-
-    // if (xhr.status == 200) {
-    //     console.log(xhr.responseText);
-    // }
+    Array.from(allBugs.bugs).map((bug) => {
+        let status = bug.status;
+        let id = bug.id;
+        let assignedTo = bug.assigned_to;
+        let summary = bug.summary;
+        let severity = bug.severity;
+        let priority = bug.priority;
+        
+        document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
+        <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `"
+  data-bug-resolution="" draggable="true">
+            <div class="card-summary">` + summary + `</div>
+            <div class="card-meta">
+                <span class="badges">
+                    <span class="badge bug-number">
+                        <a class="card-ref" href="https://bugs.etersoft.ru/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
+                    </span>
+                    <span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
+                    <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
+                </span>
+                <span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
+                    <img class="gravatar" style="display: block;" src="https://www.gravatar.com/avatar/3f0be5d4ca43937901b6eb49a678fcd3?s=20&amp;d=identicon">
+                </span>
+            </div>
+        </div>
+        `;
+    });
 }
