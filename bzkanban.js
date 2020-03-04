@@ -143,6 +143,7 @@ function createQueryFields() {
     productIcon.title = "Product";
 
     var productList = document.createElement("select");
+    productList.className = "custom-select";
     productList.id = "textProduct";
     productList.name = "product";
     productList.disabled = "true"; // until content is loaded
