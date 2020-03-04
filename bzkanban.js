@@ -1925,7 +1925,11 @@ function loadEmailAddress(callback) {
     response.users.forEach(function (user) {
       var userDetail = bzAssignees.get(user.name);
       userDetail.email = user.email;
-      updateGravatarIcons(user);
+
+      if (user.email !== undefined) {
+        updateGravatarIcons(user);
+      }
+
     });
     callback();
   });
