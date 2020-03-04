@@ -565,6 +565,10 @@ function loadName(callback) {
     if (!isLoggedIn()) {
         return callback();
     }
+    console.log('this is bzAuthObject', bzAuthObject)
+
+    initAllBugs();
+
     httpGet("/rest.cgi/user/" + bzAuthObject.userID, function(response) {
         bzUserFullName = response.users[0].real_name;
         if (bzUserFullName !== null) {
@@ -1742,3 +1746,27 @@ document.addEventListener("keyup", function(e) {
         hideModalCheckDraft();
     }
 });
+
+async function initAllBugs() {
+
+    let uname = bzOptions.siteUrl + '/rest/user/' + bzAuthObject.userID + '?include_fields=name';
+
+
+
+    // url = bzOptions.siteUrl + '/bugs&token=' + bzAuthObject.userToken;
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', uname, false);
+
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.setRequestHeader('Content-type', 'application/json');
+    
+    xhr.send();
+
+    let response = await xhr.responseText;
+
+    console.log(response);
+
+    // if (xhr.status == 200) {
+    //     console.log(xhr.responseText);
+    // }
+}
