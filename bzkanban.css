@@ -359,6 +359,9 @@ a:hover {
 #actions span {
     margin-left: 8px;
 }
+.btnStyle{
+    padding: 10px;
+}
 .busy {
     cursor: wait;
 }

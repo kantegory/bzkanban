@@ -246,6 +246,7 @@ function createQueryFields() {
 function createBacklogButton() {
     var backlogShowButton = document.createElement("button");
     backlogShowButton.id = "btnShowBacklog";
+    backlogShowButton.className = "btnStyle";
     backlogShowButton.innerText = "Show Backlog";
     backlogShowButton.style.display = "none";
     backlogShowButton.addEventListener("click", function() {
@@ -265,6 +266,7 @@ function createActions() {
 
     var newbug = document.createElement("button");
     newbug.id = "btnCreate";
+    newbug.className = "btnStyle";
     newbug.innerText = "New Bug";
     newbug.style.display = "none";
     newbug.addEventListener("click", function() {
