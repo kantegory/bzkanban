@@ -196,6 +196,7 @@ function createQueryFields() {
   });
 
 
+
   var assignee = document.createElement("span");
 
   var assigneeIcon = document.createElement("i");
@@ -1312,6 +1313,7 @@ function dragCardLeave(ev) {
 }
 
 function dragCard(ev) {
+
   // Disable pointer-events for all other cards so that we
   // can reliably detect when a card enters and leaves a column.
   var cards = document.querySelectorAll(".card");
@@ -1324,10 +1326,10 @@ function dragCard(ev) {
   var card = ev.currentTarget;
   var bugID = card.dataset.bugId;
   var bugData = {
-    id: bugID,
-    status: card.dataset.bugStatus,
-    priority: card.dataset.bugPriority,
-    severity: card.dataset.bugSeverity
+    "id": bugID,
+    "status": card.dataset.bugStatus,
+    "priority": card.dataset.bugPriority,
+    "severity": card.dataset.bugSeverity
   };
   ev.dataTransfer.setData("text", JSON.stringify(bugData));
 }
@@ -1967,6 +1969,7 @@ document.addEventListener("keyup", function (e) {
   }
 });
 
+
 async function fetchAllUserBugs(state) {
   if (state !== undefined) {
     // reset all if it was a callback
@@ -1981,6 +1984,7 @@ async function fetchAllUserBugs(state) {
       "?token=" +
       bzAuthObject.userToken +
       "&include_fields=name";
+
     let response = await fetch(uname);
     let name = await response.json();
     name = name.users[0].name;
@@ -2047,7 +2051,7 @@ function initBugs(bugs, state) {
     }
   });
   if (isLoggedIn() && bzOptions.allowEditBugs) {
-    // console.log('is logged?', isLoggedIn(), 'is allowEditBugs', bzOptions.allowEditBugs)
+
     Array.from(document.querySelectorAll(".card")).map((elem) => {
       elem.addEventListener("dragstart", function (event) {
         // fix draggable
@@ -2080,3 +2084,4 @@ function validate (evt) {
     if (theEvent.preventDefault) theEvent.preventDefault();   
   } 
 };
+
