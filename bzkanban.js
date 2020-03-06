@@ -128,7 +128,7 @@ function initBoard(callbackInitBoard) {
     function(err, results) {
         console.log("Board initialized!");
         callbackInitBoard();
-        initAllUserBugs();
+        fetchAllUserBugs('assigned_to');
     });
 }
 
@@ -286,12 +286,24 @@ function createActions() {
         showLoginModal();
     });
 
+    var showMyBugs = document.createElement("button");
+    showMyBugs.id = "showMyBugs";
+    showMyBugs.innerText = "Show my bugs";
+    showMyBugs.addEventListener("click", function() { fetchAllUserBugs('assigned_to'); });
+
+    var showPupilBugs = document.createElement("button");
+    showPupilBugs.id = "showPupilBugs";
+    showPupilBugs.innerText = "Show pupil bugs";
+    showPupilBugs.addEventListener("click", function() { fetchAllUserBugs('qa_contact'); });
+
     var bell = document.createElement("i");
     bell.id = "notification";
     bell.className = "fa fa-bell";
 
     actions.appendChild(createBacklogButton());
     actions.appendChild(newbug);
+    actions.appendChild(showMyBugs);
+    actions.appendChild(showPupilBugs);
     actions.appendChild(whoami);
     actions.appendChild(login);
     actions.appendChild(bell);
@@ -1750,14 +1762,14 @@ document.addEventListener("keyup", function(e) {
     }
 });
 
-async function initAllUserBugs() {
+async function fetchAllUserBugs(state) {
 
     let uname = bzOptions.siteUrl + '/rest/user/' + bzAuthObject.userID + '?token=' + bzAuthObject.userToken + '&include_fields=name';
     let response = await fetch(uname);
     let name = await response.json();
     name = name.users[0].name;
 
-    let allBugsUrl = bzOptions.siteUrl + '/rest/bug?token=' + bzAuthObject.userToken +  '&assigned_to=' + name;
+    let allBugsUrl = bzOptions.siteUrl + '/rest/bug?token=' + bzAuthObject.userToken +  '&' + state + '=' + name;
     let allBugsResponse = await fetch(allBugsUrl);
     let allBugs = await allBugsResponse.json();
 
@@ -1765,6 +1777,9 @@ async function initAllUserBugs() {
 }
 
 function initBugs(bugs) {
+
+    Array.from(document.querySelectorAll('.card')).map((elem) => { elem.remove(); })
+
     Array.from(bugs).map((bug) => {
         let status = bug.status;
         let id = bug.id;
