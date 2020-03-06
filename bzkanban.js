@@ -128,7 +128,7 @@ function initBoard(callbackInitBoard) {
     function(err, results) {
         console.log("Board initialized!");
         callbackInitBoard();
-        initAllBugs();
+        initAllUserBugs();
     });
 }
 
@@ -1000,6 +1000,8 @@ function httpRequest(method, url, dataObj, successCallback, errorCallback) {
                 }
 
                 console.error(obj.message);
+                console.log(obj);
+                console.log('error callback', errorCallback);
 
                 if (errorCallback !== undefined) {
                     errorCallback(obj);
@@ -1154,7 +1156,6 @@ function dragCardOver(ev) {
 
 function dragCardEnter(ev) {
     ev.preventDefault();
-
     if (ev.target.classList.contains("board-column")) {
         ev.currentTarget.classList.add("drag-card");
     }
@@ -1184,7 +1185,10 @@ function dragCard(ev) {
         "priority": card.dataset.bugPriority,
         "severity": card.dataset.bugSeverity
     };
+
+    console.log('data', bugData);
     ev.dataTransfer.setData("text", JSON.stringify(bugData));
+
 }
 
 function dragCardEnd(ev) {
@@ -1746,7 +1750,7 @@ document.addEventListener("keyup", function(e) {
     }
 });
 
-async function initAllBugs() {
+async function initAllUserBugs() {
 
     let uname = bzOptions.siteUrl + '/rest/user/' + bzAuthObject.userID + '?token=' + bzAuthObject.userToken + '&include_fields=name';
     let response = await fetch(uname);
@@ -1757,42 +1761,48 @@ async function initAllBugs() {
     let allBugsResponse = await fetch(allBugsUrl);
     let allBugs = await allBugsResponse.json();
 
-    Array.from(allBugs.bugs).map((bug) => {
+    initBugs(allBugs.bugs);
+}
+
+function initBugs(bugs) {
+    Array.from(bugs).map((bug) => {
         let status = bug.status;
         let id = bug.id;
         let assignedTo = bug.assigned_to;
         let summary = bug.summary;
         let severity = bug.severity;
         let priority = bug.priority;
-	let lastChangeTime = new Date(bug.last_change_time);
-	let currTime = new Date();
-	let maxTimeDiff = 14;  // time diff in days
-	let timeDiff = Math.floor((currTime - lastChangeTime) / 1000 / 60 / 60 / 24);  // get diff currTime lastChangeTime in days
+        let lastChangeTime = new Date(bug.last_change_time);
+        let currTime = new Date();
+        let maxTimeDiff = 14;  // time diff in days
+        let timeDiff = Math.floor((currTime - lastChangeTime) / 1000 / 60 / 60 / 24);  // get diff currTime lastChangeTime in days
 
-	
-	if (timeDiff < maxTimeDiff) {
-	    document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
-                <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
-                    <div class="card-summary">` + summary + `</div>
-                        <div class="card-meta">
-                	    <span class="badges">
-                       	        <span class="badge bug-number">
-                            	    <a class="card-ref" href="` + bzOptions.siteUrl + `/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
-                        	</span>
-                        	<span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
-                        	    <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
-                    		</span>
-                    		<span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
-                        	    <img class="gravatar" style="display: block;" src="` + getGravatarImgSrc(bug.assigned_to_detail.email) + `">
-                    		</span>
-                	</div>
-            	</div>
-            `;
+        console.log(bug);
+
+        if (timeDiff < maxTimeDiff) {
+            document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
+                    <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
+                        <div class="card-summary">` + summary + `</div>
+                            <div class="card-meta">
+                            <span class="badges">
+                                    <span class="badge bug-number">
+                                        <a class="card-ref" href="` + bzOptions.siteUrl + `/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
+                                </span>
+                                <span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
+                                    <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
+                                </span>
+                                <span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
+                                    <img class="gravatar" style="display: block;" src="` + getGravatarImgSrc(bug.assigned_to_detail.email) + `">
+                                </span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        if (isLoggedIn() && bzOptions.allowEditBugs) {
+            // console.log('is logged?', isLoggedIn(), 'is allowEditBugs', bzOptions.allowEditBugs)
+            Array.from(document.querySelectorAll('.card')).map((elem) => {
+                elem.addEventListener("dragstart", dragCard);
+            });
         }
-    });
-
-    Array.from(document.querySelectorAll('.card')).map((elem) => {
-        elem.addEventListener("dragstart", dragCard);
-    });
-
 }
