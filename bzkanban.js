@@ -1764,24 +1764,28 @@ async function initAllBugs() {
         let summary = bug.summary;
         let severity = bug.severity;
         let priority = bug.priority;
-        
+
         document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
-        <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `"
-  data-bug-resolution="" draggable="true">
-            <div class="card-summary">` + summary + `</div>
-            <div class="card-meta">
-                <span class="badges">
-                    <span class="badge bug-number">
-                        <a class="card-ref" href="https://bugs.etersoft.ru/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
+            <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
+                <div class="card-summary">` + summary + `</div>
+                <div class="card-meta">
+                    <span class="badges">
+                        <span class="badge bug-number">
+                            <a class="card-ref" href="` + bzOptions.siteUrl + `/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
+                        </span>
+                        <span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
+                        <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
                     </span>
-                    <span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
-                    <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
-                </span>
-                <span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
-                    <img class="gravatar" style="display: block;" src="https://www.gravatar.com/avatar/3f0be5d4ca43937901b6eb49a678fcd3?s=20&amp;d=identicon">
-                </span>
+                    <span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
+                        <img class="gravatar" style="display: block;" src="` + getGravatarImgSrc(bug.assigned_to_detail.email) + `">
+                    </span>
+                </div>
             </div>
-        </div>
         `;
     });
+
+    Array.from(document.querySelectorAll('.card')).map((elem) => {
+        elem.addEventListener("dragstart", dragCard);
+    });
+
 }
