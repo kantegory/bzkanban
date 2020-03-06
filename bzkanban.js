@@ -1764,24 +1764,31 @@ async function initAllBugs() {
         let summary = bug.summary;
         let severity = bug.severity;
         let priority = bug.priority;
+	let lastChangeTime = new Date(bug.last_change_time);
+	let currTime = new Date();
+	let maxTimeDiff = 14;  // time diff in days
+	let timeDiff = Math.floor((currTime - lastChangeTime) / 1000 / 60 / 60 / 24);  // get diff currTime lastChangeTime in days
 
-        document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
-            <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
-                <div class="card-summary">` + summary + `</div>
-                <div class="card-meta">
-                    <span class="badges">
-                        <span class="badge bug-number">
-                            <a class="card-ref" href="` + bzOptions.siteUrl + `/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
-                        </span>
-                        <span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
-                        <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
-                    </span>
-                    <span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
-                        <img class="gravatar" style="display: block;" src="` + getGravatarImgSrc(bug.assigned_to_detail.email) + `">
-                    </span>
-                </div>
-            </div>
-        `;
+	
+	if (timeDiff < maxTimeDiff) {
+	    document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
+                <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
+                    <div class="card-summary">` + summary + `</div>
+                        <div class="card-meta">
+                	    <span class="badges">
+                       	        <span class="badge bug-number">
+                            	    <a class="card-ref" href="` + bzOptions.siteUrl + `/show_bug.cgi?id=` + id +`" target="_blank">#` + id + `</a>
+                        	</span>
+                        	<span class="badge priority" title="Priority" data-priority="` + priority + `">` + priority + `</span>
+                        	    <span class="badge severity" title="Severity" data-severity="` + severity + `">` + severity + `</span>
+                    		</span>
+                    		<span title="Assignee" class="assignee" data-assignee-name="` + assignedTo + `"><span class="fullname">` + assignedTo + `</span>
+                        	    <img class="gravatar" style="display: block;" src="` + getGravatarImgSrc(bug.assigned_to_detail.email) + `">
+                    		</span>
+                	</div>
+            	</div>
+            `;
+        }
     });
 
     Array.from(document.querySelectorAll('.card')).map((elem) => {
