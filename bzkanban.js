@@ -496,7 +496,7 @@ function loadMilestonesList(callback) {
         hiddenOption.value = "";
         hiddenOption.setAttribute("disabled", "");
         hiddenOption.setAttribute("selected", "");
-        hiddenOption.text = "Выберите раздел:";
+        hiddenOption.text = "Выберите версию:";
         document.getElementById("textMilestone").appendChild(hiddenOption);
         milestones.forEach(function(milestone) {
             var option = document.createElement("option");
