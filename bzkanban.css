@@ -28,7 +28,7 @@ body {
     font-weight: bold;
     padding: 10px 5px 5px 5px;
     margin-bottom: 5px;
-    background: #FFCC40;
+    background: rgb(255, 212, 92);
     color: rgb(43, 43, 43);
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
 }
@@ -167,6 +167,11 @@ body {
     width: 170px;
     border-radius: 0 3px 3px 0;  
 }
+
+#query select:disabled{
+    background-color: rgba(105, 102, 102, 0.445);
+}
+
 select{
     display: inline-block;
     width: 100%;
@@ -184,6 +189,7 @@ select{
     -moz-appearance: none;
     appearance: none;
 }
+
 #query input{
     height: 30px;
     width: 140px;
@@ -373,6 +379,7 @@ a:hover {
 #actions button,
 #actions span {
     margin-left: 8px;
+    cursor: pointer;
 }
 .btnStyle{
     padding: 10px;

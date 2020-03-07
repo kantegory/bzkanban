@@ -463,12 +463,19 @@ function loadProductsList(callback) {
         products.sort(function(a, b) {
             return a.name.localeCompare(b.name);
         });
+        var hiddenOption = document.createElement("option");
+        hiddenOption.value = "";
+        hiddenOption.setAttribute("disabled", "");
+        hiddenOption.setAttribute("selected", "");
+        hiddenOption.text = "Выберите раздел:";
+        document.getElementById("textProduct").appendChild(hiddenOption);
         products.forEach(function(product) {
             var option = document.createElement("option");
             option.value = product.name;
             option.text = product.name;
             document.getElementById("textProduct").appendChild(option);
         });
+        
         // select it in list.
         document.getElementById("textProduct").value = bzProduct;
 
@@ -485,16 +492,24 @@ function loadMilestonesList(callback) {
     httpGet("/rest.cgi/product?names=" + bzProduct + "&include_fields=milestones", function(response) {
         document.getElementById("textMilestone").disabled = false;
         var milestones = response.products[0].milestones;
+        var hiddenOption = document.createElement("option");
+        hiddenOption.value = "";
+        hiddenOption.setAttribute("disabled", "");
+        hiddenOption.setAttribute("selected", "");
+        hiddenOption.text = "Выберите раздел:";
+        document.getElementById("textMilestone").appendChild(hiddenOption);
         milestones.forEach(function(milestone) {
             var option = document.createElement("option");
             option.value = milestone.name;
             option.text = milestone.name;
             document.getElementById("textMilestone").appendChild(option);
         });
+
         // select it in list.
         document.getElementById("textMilestone").value = bzProductMilestone;
 
         callback();
+
     });
 }
 
@@ -507,7 +522,12 @@ function loadAssigneesList() {
     });
 
     var elem = document.getElementById("textAssignee");
-
+    var hiddenOption = document.createElement("option");
+    hiddenOption.value = "";
+    hiddenOption.setAttribute("disabled", "");
+    hiddenOption.setAttribute("selected", "");
+    hiddenOption.text = "Выберите сотрудника:";
+    document.getElementById("textAssignee").appendChild(hiddenOption);
     sorted.forEach(function(assignee) {
         var option = document.createElement("option");
         option.value = assignee.email;
