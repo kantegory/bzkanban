@@ -195,12 +195,13 @@ function createQueryFields() {
     loadBoard();
   });
 
+
   var assignee = document.createElement("span");
 
   var assigneeIcon = document.createElement("i");
   assigneeIcon.className = "fa fa-user";
   assigneeIcon.title = "Assignee";
-
+ 
   var assigneeList = document.createElement("select");
   assigneeList.id = "textAssignee";
   assigneeList.name = "assignee";
@@ -218,12 +219,12 @@ function createQueryFields() {
 
   var filterIcon = document.createElement("i");
   filterIcon.className = "fa fa-search";
-  filterIcon.title = "Filter";
+  filterIcon.title = "Search cards";
 
   var filterText = document.createElement("input");
   filterText.id = "textFilter";
   filterText.name = "textFilter";
-  filterText.placeholder = "Filter";
+  filterText.placeholder = "Search cards";
   filterText.addEventListener("keyup", function () {
     debounce(filterByString(document.getElementById("textFilter").value), 500);
   });
