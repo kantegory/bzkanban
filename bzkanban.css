@@ -19,11 +19,13 @@ body {
     height: 100%;
     flex-direction: column;
 }
+
 #board {
     display: flex;
     flex: 1;
     overflow-x: auto;
 }
+
 .board-column-title {
     font-weight: bold;
     padding: 10px 5px 5px 5px;
@@ -32,10 +34,12 @@ body {
     color: rgb(43, 43, 43);
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
 }
+
 .cards {
     overflow-x: hidden;
     align-self: stretch;
 }
+
 .board-column-card-count {
     font-weight: normal;
     color: grey;
@@ -46,6 +50,7 @@ body {
     /* border-color: lightgrey; */
     padding: 2px 3px;
 }
+
 .board-column {
     flex: 1;
     display: flex;
@@ -53,11 +58,13 @@ body {
     margin: 0 4px;
     max-width: max-content;
 }
+
 .board-column.drag-card {
     outline-width: 2px;
     outline-style: dashed;
     outline-color: grey;
 }
+
 .board-column-content {
     display: flex;
     align-items: flex-start;
@@ -66,10 +73,12 @@ body {
     border-radius: 0 0 3px 3px;
     background: #E2E4E6;
 }
+
 #BACKLOG .board-column-title,
 #BACKLOG .board-column-content {
     background: darkgrey;
 }
+
 .card {
     background-color: white;
     border-radius: 3px;
@@ -79,15 +88,17 @@ body {
     box-shadow: 0px 1px 0px #956BD6;
     cursor: pointer;
 }
+
 .card:hover {
     background-color: ghostwhite;
     border-color: black;
+
 }
-.card-ref {
-}
+
 .card-summary {
     word-break: break-word;
 }
+
 .card-meta {
     font-size: smaller;
     color: grey;
@@ -98,6 +109,7 @@ body {
     flex-wrap: wrap;
     justify-content: flex-start;
 }
+
 .card-meta .assignee {
     display: flex;
     flex: 1 1 auto;
@@ -105,43 +117,53 @@ body {
     flex-wrap: wrap;
     justify-content: flex-end;
 }
+
 .assignee .gravatar {
     margin-left: 5px;
     border-radius: 10px;
 }
+
 .card-meta .badge {
     margin-right: 10px;
 }
+
 .badge .fa {
     padding-right: 3px;
 }
+
 .badge[data-severity='blocker'],
 .badge[data-severity='critical'],
 .badge[data-severity='major'] {
     color: red;
 }
+
 .badge[data-severity='normal'],
 .badge[data-severity='minor'],
 .badge[data-severity='trivial'] {
     color: gray;
 }
+
 .badge[data-severity='enhancement'] {
     color: green;
 }
+
 .badge[data-priority='P1'],
 .badge[data-priority='Highest'] {
     color: red;
 }
+
 .badge[data-priority='P2'],
 .badge[data-priority='High'] {
     color: orange;
 }
+
 .badge[data-priority='P3'],
 .badge[data-priority='Normal'],
 .badge[data-priority='normal'],
 .badge[data-priority='---'] {
     color: green;
 }
+
 #textBacklog {
     width: 100px;
     border-style: solid;
@@ -153,6 +175,7 @@ body {
     font-size: small;
     margin-left: 15px;
 }
+
 #query .fa {
     vertical-align: bottom;
     border-radius: 3px 0 0 3px;
@@ -163,6 +186,7 @@ body {
     background-color: white;
 
 }
+
 #query select{
     width: 170px;
     border-radius: 0 3px 3px 0;  
@@ -195,28 +219,35 @@ select{
     width: 140px;
     border-radius: 0 3px 3px 0;
 }
+
 #query span {
     margin-right: 8px;
 }
+
 #whoami {
     font-size: small;
 }
+
 #notification {
     display: none;
     margin-left: 8px;
 }
+
 #nav {
     flex: none;
     display: flex;
     flex-wrap: wrap;
     padding: 20px 4px;
 }
+
 #nav span {
     align-self: center;
 }
+
 #nav .spring {
     flex: 1;
 }
+
 .modal {
     position: fixed;
     z-index: 1;
@@ -229,6 +260,7 @@ select{
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 }
+
 .modal-content {
     display: flex;
     background-color: white;
@@ -245,6 +277,7 @@ select{
     max-height: 80%;
     border: none;
 }
+
 @keyframes animatetop {
     from {
         top: -300px;
@@ -255,40 +288,49 @@ select{
         opacity: 1;
     }
 }
+
 .modalClose {
     float: right;
 }
+
 .modalClose:hover,
 .modalClose:focus {
     color: grey;
     cursor: pointer;
 }
+
 .modal-header {
     font-size: x-large;
 }
+
 .modal-header,
 .modal-body,
 .modal-footer {
     padding: 15px;
     align-self: stretch;
 }
+
 .modal-header input {
     width: 80%;
     font-size: inherit;
     padding: initial;
 }
+
 .modal-header label:hover {
     cursor: auto;
 }
+
 .modal-body,
 .modal-footer {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
 }
+
 .modal-footer {
     min-height: 25px;
 }
+
 .modal-body input,
 .modal-body select {
     width: 100%;
@@ -310,25 +352,31 @@ select{
     padding: .5rem .75rem;
     box-sizing: border-box;
 }
+
 .modal-body label {
     margin-top: 10px;
     font-weight: bold;
     padding: 6px;
 }
+
 .modal-body ul {
     margin: 0px;
 }
+
 .modal-footer button {
     align-self: flex-end;
     padding: 10px;
 }
+
 #modalBug .modal-body,
 #modalNewBug .modal-body {
     flex-direction: row;
 }
+
 #modalBug .card-ref {
     margin-left: 10px;
 }
+
 .bug-comments {
     display: flex;
     flex-direction: column;
@@ -336,6 +384,7 @@ select{
     min-width: 75%;
     max-width: 75%;
 }
+
 .bug-meta {
     display: flex;
     flex-direction: column;
@@ -343,6 +392,7 @@ select{
     margin-left: 10px;
     width: 100%;
 }
+
 .bug-comment {
     border-style: solid;
     border-color: darkgrey;
@@ -352,10 +402,12 @@ select{
     font-weight: normal;
     font-size: small;
 }
+
 .bug-comment-date {
     padding-left: 20px;
     font-size: x-small;
 }
+
 select, textarea, input, button {
     padding: 3px;
     border-radius: 3px;
@@ -364,48 +416,62 @@ select, textarea, input, button {
     border-color: darkgrey;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
 }
+
 button {
     background-color: #fff;
 }
+
 button:hover {
     background-color: #FFCC40;
 }
+
 a {
     color: grey;
 }
+
 a:hover {
     color: lightgrey;
 }
+
 #actions button,
 #actions span {
     margin-left: 8px;
     cursor: pointer;
 }
+
 .btnStyle{
     padding: 10px;
 }
+
 .busy {
     cursor: wait;
 }
+
 @media only screen and (max-device-width: 480px) {
+
     body {
         background-attachment: fixed;
     }
+
     #board {
         display: block;
     }
+
     #modalBug .modal-body,
     #modalNewBug .modal-body {
         flex-direction: column;
     }
+
     .modal-content {
         width: initial;
     }
+
     .bug-comments {
         display: block;
         min-width: initial;
         max-width: initial;
     }
+    
     .bug-meta {
         display: block;
         margin-left: 0;
