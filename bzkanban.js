@@ -292,11 +292,13 @@ function createActions() {
 
     var showMyBugs = document.createElement("button");
     showMyBugs.id = "showMyBugs";
+    showMyBugs.className = "btnStyle";
     showMyBugs.innerText = "Show my bugs";
     showMyBugs.addEventListener("click", function() { fetchAllUserBugs('assigned_to'); });
 
     var showPupilBugs = document.createElement("button");
     showPupilBugs.id = "showPupilBugs";
+    showPupilBugs.className = "btnStyle";
     showPupilBugs.innerText = "Show pupil bugs";
     showPupilBugs.addEventListener("click", function() { fetchAllUserBugs('qa_contact'); });
 
@@ -1805,22 +1807,22 @@ function initBugs(bugs) {
     Array.from(document.querySelectorAll('.card')).map((elem) => { elem.remove(); })
 
     Array.from(bugs).map((bug) => {
-        let status = bug.status;
+	console.log("this is a bug info", bug);
+	let status = bug.status;
         let id = bug.id;
         let assignedTo = bug.assigned_to;
         let summary = bug.summary;
         let severity = bug.severity;
         let priority = bug.priority;
+	let milestone = bug.target_milestone;
         let lastChangeTime = new Date(bug.last_change_time);
         let currTime = new Date();
         let maxTimeDiff = 14;  // time diff in days
         let timeDiff = Math.floor((currTime - lastChangeTime) / 1000 / 60 / 60 / 24);  // get diff currTime lastChangeTime in days
 
-        console.log(bug);
-
         if (timeDiff < maxTimeDiff) {
             document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
-                    <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" draggable="true">
+                    <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" data-bug-milestone="` + milestone  + `" draggable="true">
                         <div class="card-summary">` + summary + `</div>
                             <div class="card-meta">
                             <span class="badges">
@@ -1841,7 +1843,11 @@ function initBugs(bugs) {
         if (isLoggedIn() && bzOptions.allowEditBugs) {
             // console.log('is logged?', isLoggedIn(), 'is allowEditBugs', bzOptions.allowEditBugs)
             Array.from(document.querySelectorAll('.card')).map((elem) => {
-                elem.addEventListener("dragstart", dragCard);
+                elem.addEventListener("dragstart", function(event) {
+			// fix draggable
+			bzProductMilestone = elem.dataset["bug-milestone"];
+			dragCard(event);
+		});
             });
         }
 }
