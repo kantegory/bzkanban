@@ -1847,9 +1847,10 @@ function initBugs(bugs, state) {
 			bzProductMilestone = this.dataset.bugMilestone;
 			//window.setTimeout(() => fetchAllUserBugs(state), 10000);
 			dragCard(event);
-			console.error("dragged");
-			// try to refresh
-			fetchAllUserBugs(state);
+		});
+
+		elem.addEventListener("dragend", function() {
+			document.querySelector("#submitComment").addEventListener("click", function() { fetchAllUserBugs(state) });
 		});
 
 		elem.addEventListener("click", function(event) {
