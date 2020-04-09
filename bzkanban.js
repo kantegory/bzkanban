@@ -1226,7 +1226,6 @@ function dragCard(ev) {
 
     console.log('data', bugData);
     ev.dataTransfer.setData("text", JSON.stringify(bugData));
-
 }
 
 function dragCardEnd(ev) {
@@ -1799,15 +1798,15 @@ async function fetchAllUserBugs(state) {
     let allBugsResponse = await fetch(allBugsUrl);
     let allBugs = await allBugsResponse.json();
 
-    initBugs(allBugs.bugs);
+    initBugs(allBugs.bugs, state);
 }
 
-function initBugs(bugs) {
+function initBugs(bugs, state) {
 
     Array.from(document.querySelectorAll('.card')).map((elem) => { elem.remove(); })
 
     Array.from(bugs).map((bug) => {
-	console.log("this is a bug info", bug);
+
 	let status = bug.status;
         let id = bug.id;
         let assignedTo = bug.assigned_to;
@@ -1822,7 +1821,7 @@ function initBugs(bugs) {
 
         if (timeDiff < maxTimeDiff) {
             document.querySelector('#' + status + ' .board-column-content .cards').innerHTML += `
-                    <div class="card" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" data-bug-milestone="` + milestone  + `" draggable="true">
+                    <div class="card" id="` + id + `" data-bug-id="` + id + `" data-bug-status="` + status + `" data-bug-priority="` + priority + `" data-bug-severity="` + severity + `" data-bug-resolution="" data-bug-milestone="` + milestone  + `" draggable="true">
                         <div class="card-summary">` + summary + `</div>
                             <div class="card-meta">
                             <span class="badges">
@@ -1845,9 +1844,24 @@ function initBugs(bugs) {
             Array.from(document.querySelectorAll('.card')).map((elem) => {
                 elem.addEventListener("dragstart", function(event) {
 			// fix draggable
-			bzProductMilestone = elem.dataset["bug-milestone"];
+			bzProductMilestone = this.dataset.bugMilestone;
+			//window.setTimeout(() => fetchAllUserBugs(state), 10000);
 			dragCard(event);
+			console.error("dragged");
+			// try to refresh
+			fetchAllUserBugs(state);
 		});
+
+		elem.addEventListener("click", function(event) {
+			let bugObject = {};
+			bugObject.id = this.dataset.bugId;
+			bugObject.status = this.dataset.bugStatus;
+			bugObject.priority = this.dataset.bugPriority;
+			bugObject.severity = this.dataset.bugSeverity;
+			bugObject.resolution = this.dataset.bugResolution;
+
+			showBugModal(bugObject, bugObject);
+		})
             });
         }
 }
