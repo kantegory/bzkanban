@@ -328,17 +328,17 @@ select{
 }
 
 .modal-footer {
-    min-height: 25px;
+    min-height: 30px;
 }
 
 .modal-body input,
 .modal-body select {
     width: 100%;
-    margin-top: 7px;
+    margin-top: .5rem;
 }
 
 .modal-body input{
-    margin-top: 7px;
+    margin-top: .5rem;
     padding: .5rem .75rem;
     box-sizing: border-box;
 }
@@ -348,15 +348,16 @@ select{
     height: 200px;
     resize: vertical;
     resize: none;
-    margin-top: 9px;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
     padding: .5rem .75rem;
     box-sizing: border-box;
 }
 
 .modal-body label {
-    margin-top: 10px;
+    margin-top: 1rem;
     font-weight: bold;
-    padding: 6px;
+    padding: .5rem 0;
 }
 
 .modal-body ul {
@@ -445,6 +446,13 @@ a:hover {
 
 .busy {
     cursor: wait;
+}
+
+.time-title {
+  font-size: 8pt;
+  font-weight: normal;
+  text-decoration: none;
+  margin-top: 1rem;
 }
 
 @media only screen and (max-device-width: 480px) {

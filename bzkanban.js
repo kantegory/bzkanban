@@ -295,7 +295,7 @@ function createActions() {
   var showMyBugs = document.createElement("button");
   showMyBugs.id = "showMyBugs";
   showMyBugs.className = "btnStyle";
-  showMyBugs.innerText = "Show my bugs";
+  showMyBugs.innerText = "My bugs";
   showMyBugs.addEventListener("click", function () {
     fetchAllUserBugs("assigned_to");
   });
@@ -303,7 +303,7 @@ function createActions() {
   var showPupilBugs = document.createElement("button");
   showPupilBugs.id = "showPupilBugs";
   showPupilBugs.className = "btnStyle";
-  showPupilBugs.innerText = "Show pupil bugs";
+  showPupilBugs.innerText = "Bugs I'm interested in";
   showPupilBugs.addEventListener("click", function () {
     fetchAllUserBugs("qa_contact");
   });
@@ -377,9 +377,17 @@ function showLoginModal() {
   document.querySelector(bzOptions.domElement).appendChild(loginModal);
 }
 
-function loadBoard(callbackLoadBoard) {
+function loadBoard(callbackLoadBoard, state) {
+  console.log("state in loadBoard", state);
+  console.log("callbackLoadBoard", callbackLoadBoard)
   if (bzProduct === "" || bzProductMilestone === "") {
+    console.error("product is none")
     if (callbackLoadBoard !== undefined) {
+      console.log("callback isnot undefined, state is", state)
+      if (state !== undefined) {
+	console.log("state isnot undefined");
+        return callbackLoadBoard(state);
+      }
       return callbackLoadBoard();
     } else {
       return;
@@ -816,6 +824,7 @@ function addBoardColumn(status) {
 function createCard(bug) {
   var card = document.createElement("div");
   card.className = "card";
+  card.id = bug.id;
   card.dataset.bugId = bug.id;
   card.dataset.bugStatus = bug.status;
   card.dataset.bugPriority = bug.priority;
@@ -1248,9 +1257,13 @@ function showColumnCounts() {
 
 function writeBug(dataObj) {
   dataObj.token = bzAuthObject.userToken;
+  console.log("dataObj in writeBug", dataObj);
+  let state = dataObj.state;
+
+  delete dataObj.state;
 
   httpPut("/rest.cgi/bug/" + dataObj.id, dataObj, function () {
-    loadBoard();
+    loadBoard(fetchAllUserBugs, state);
   });
 }
 
@@ -1328,6 +1341,7 @@ function dropCard(ev) {
     bugUpdate.status = ev.currentTarget.id;
     bugUpdate.target_milestone = bzProductMilestone;
   }
+  console.log("bugUpdate", bugUpdate);
 
   if (bzOptions.addCommentOnChange) {
     showBugModal(bugCurrent, bugUpdate);
@@ -1760,14 +1774,30 @@ function showBugModal(bugCurrent, bugUpdate) {
   submit.onclick = function () {
     bugUpdate.comment = {};
     bugUpdate.comment.body = document.querySelector("#commentBoxText").value;
+    let workTime = parseInt(document.querySelector("#workTime").value) > 0 ? parseInt(document.querySelector("#workTime").value) : 1;
+    let productiveTime = parseInt(document.querySelector("#productiveTime").value) > 0 ? parseInt(document.querySelector("#productiveTime").value) : 1;
+    bugUpdate.work_time = Math.ceil((workTime / 60) * 100) / 100;
+    bugUpdate.productive_time = Math.ceil((productiveTime / 60) * 100) / 100;
+    let state = document.getElementById(`${bugUpdate.id}`).dataset.state;
+    bugUpdate.state = state;
 
-    var newBugSummary = document.querySelector("#card-summary-new");
-    if (newBugSummary) {
-      bugUpdate.summary = newBugSummary.value;
+    if (productiveTime > workTime) {
+      alert("Productive time mustn't greater than work time");
+    } else if (bugUpdate.productive_time > 1 && document.querySelector("#commentBoxText").value.length < bugUpdate.productive_time * 60) {
+      alert("You shouldn't write such a short comment. We want you to write 60 symbols for each hour as minimal");
+    } else if (bugUpdate.productive_time > 3) {
+      alert("You shouldn't write all of your work in one comment, if you put productive time greater than 3 hours");
+    } else if (bugUpdate.work_time > 8) {
+      alert("You shouldn't put your work time greater than 8 hours.")
+    } else {
+      var newBugSummary = document.querySelector("#card-summary-new");
+      if (newBugSummary) {
+        bugUpdate.summary = newBugSummary.value;
+      }
+
+      hideModal();
+      writeBug(bugUpdate);
     }
-
-    hideModal();
-    writeBug(bugUpdate);
   };
 
   footer.appendChild(submit);
@@ -1802,14 +1832,49 @@ function hideModal() {
 
 function createCommentsBox() {
   // Add enterable textarea for new comment
+  let commentContainer = document.createElement("div");
+
   var commentBoxLabel = document.createElement("label");
   commentBoxLabel.innerText = "Additional Comments";
+
   var commentBox = document.createElement("textarea");
   commentBox.id = "commentBoxText";
+  commentBox.placeholder = "Write coment...";
 
   commentBoxLabel.appendChild(commentBox);
 
-  return commentBoxLabel;
+  let timeLabel = document.createElement("label");
+  timeLabel.innerText = "Put work time:"
+
+  let workTimeTitle = document.createElement("div");
+  workTimeTitle.classList.add("time-title");
+  workTimeTitle.innerHTML = "Work time";
+
+  let workTime = document.createElement("input");
+  workTime.id = "workTime";
+  workTime.placeholder = "Work time in minutes";
+  workTime.onkeypress = validate;
+  workTime.onpaste = validate;
+
+  let productiveTimeTitle = document.createElement("div");
+  productiveTimeTitle.classList.add("time-title");
+  productiveTimeTitle.innerHTML = "Productive time";
+
+  let productiveTime = document.createElement("input");
+  productiveTime.id = "productiveTime";
+  productiveTime.placeholder = "Productive time in minutes";
+  productiveTime.onkeypress = validate;
+  productiveTime.onpaste = validate;
+
+  timeLabel.appendChild(workTimeTitle);
+  timeLabel.appendChild(workTime);
+  timeLabel.appendChild(productiveTimeTitle);
+  timeLabel.appendChild(productiveTime);
+
+  commentContainer.appendChild(commentBoxLabel);
+  commentContainer.appendChild(timeLabel);
+
+  return commentContainer;
 }
 
 function createBugNumberElement(bugId) {
@@ -1882,29 +1947,36 @@ document.addEventListener("keyup", function (e) {
 });
 
 async function fetchAllUserBugs(state) {
-  let uname =
-    bzOptions.siteUrl +
-    "/rest/user/" +
-    bzAuthObject.userID +
-    "?token=" +
-    bzAuthObject.userToken +
-    "&include_fields=name";
-  let response = await fetch(uname);
-  let name = await response.json();
-  name = name.users[0].name;
+  if (state !== undefined) {
+    // reset all if it was a callback
+    history.pushState({}, "", "?state=user_bugs");
+    document.querySelector("#btnCreate").style.display = "none";
+    Array.from(document.querySelectorAll(".board-column-card-count")).map((elem) => { elem.remove() });
+    console.log("state is", state);
+    let uname =
+      bzOptions.siteUrl +
+      "/rest/user/" +
+      bzAuthObject.userID +
+      "?token=" +
+      bzAuthObject.userToken +
+      "&include_fields=name";
+    let response = await fetch(uname);
+    let name = await response.json();
+    name = name.users[0].name;
 
-  let allBugsUrl =
-    bzOptions.siteUrl +
-    "/rest/bug?token=" +
-    bzAuthObject.userToken +
-    "&" +
-    state +
-    "=" +
-    name;
-  let allBugsResponse = await fetch(allBugsUrl);
-  let allBugs = await allBugsResponse.json();
+    let allBugsUrl =
+      bzOptions.siteUrl +
+      "/rest/bug?token=" +
+      bzAuthObject.userToken +
+      "&" +
+      state +
+      "=" +
+      name;
+    let allBugsResponse = await fetch(allBugsUrl);
+    let allBugs = await allBugsResponse.json();
 
-  initBugs(allBugs.bugs, state);
+    initBugs(allBugs.bugs, state);
+  }
 }
 
 function initBugs(bugs, state) {
@@ -1913,6 +1985,7 @@ function initBugs(bugs, state) {
   });
 
   Array.from(bugs).map((bug) => {
+    console.log('this is bug', bug)
     let status = bug.status;
     let id = bug.id;
     let assignedTo = bug.assigned_to;
@@ -1920,6 +1993,7 @@ function initBugs(bugs, state) {
     let severity = bug.severity;
     let priority = bug.priority;
     let milestone = bug.target_milestone;
+    //let product = bug.product;
     let lastChangeTime = new Date(bug.last_change_time);
     let currTime = new Date();
     let maxTimeDiff = 14; // time diff in days
@@ -1932,7 +2006,7 @@ function initBugs(bugs, state) {
         "#" + status + " .board-column-content .cards"
       ).innerHTML +=
         `
-	  <div class="card" id="${id}" data-bug-id="${id}" data-bug-status="${status}" data-bug-priority="${priority}" data-bug-severity="${severity}" data-bug-resolution="" data-bug-milestone="${milestone}" draggable="true">
+	  <div class="card" id="${id}" data-bug-id="${id}" data-state="${state}" data-bug-status="${status}" data-bug-priority="${priority}" data-bug-severity="${severity}" data-bug-resolution="" data-bug-milestone="${milestone}" draggable="true">
             <div class="card-summary">${summary}</div>
             <div class="card-meta">
               <span class="badges">
@@ -1957,15 +2031,8 @@ function initBugs(bugs, state) {
       elem.addEventListener("dragstart", function (event) {
         // fix draggable
         bzProductMilestone = this.dataset.bugMilestone;
+	//bzProduct = this.dataset.bugProduct;
         dragCard(event);
-      });
-
-      elem.addEventListener("dragend", function () {
-        document
-          .querySelector("#submitComment")
-          .addEventListener("click", function () {
-            setTimeout(() => { fetchAllUserBugs(state); }, 1000);
-          });
       });
 
       elem.addEventListener("click", function (event) {
@@ -1982,3 +2049,13 @@ function initBugs(bugs, state) {
   }
 }
 
+function validate (evt) {
+  let theEvent = evt || window.event;
+  let key = theEvent.keyCode || theEvent.which;
+  key = String.fromCharCode(key);
+  let regex = /[0-9\s]/;
+  if (!regex.test(key)) {
+    theEvent.returnValue = false;
+    if (theEvent.preventDefault) theEvent.preventDefault();   
+  } 
+};
